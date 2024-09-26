@@ -34,6 +34,17 @@ header h4 {
 header .toggle {
   display: none;
 }
+
+.button .btn1 {
+  margin-right: 10px;
+}
+
+.my-orders-btn {
+  background-color: white;
+  color: #27ae60;
+  border: #27ae60 2px solid;
+}
+
 @media screen and (max-width: 768px) {
   header {
     padding: 0;

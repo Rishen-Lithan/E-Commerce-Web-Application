@@ -1,7 +1,7 @@
 export const nav = [
   {
     text: "home",
-    path: "/",
+    path: "/home",
   },
   {
     text: "about",
@@ -12,7 +12,7 @@ export const nav = [
     path: "/services",
   },
   {
-    text: "blog",
+    text: "Product",
     path: "/blog",
   },
   {
@@ -24,6 +24,35 @@ export const nav = [
     path: "/contact",
   },
 ]
+
+export const adminNav = [
+  {
+    text: "home",
+    path: "/home",
+  },
+  {
+    text: "about",
+    path: "/about",
+  },
+  {
+    text: "Orders",
+    path: "/services",
+  },
+  {
+    text: "Product",
+    path: "/blog",
+  },
+  {
+    text: "Categories",
+    path: "/pricing",
+  },
+  {
+    text: "contact",
+    path: "/contact",
+  },
+]
+
+
 export const featured = [
   {
     cover: "../images/hero/h1.png",
