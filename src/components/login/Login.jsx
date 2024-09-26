@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
 import { useNavigate } from 'react-router-dom'; // Update import here
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -15,9 +17,11 @@ const LoginForm = () => {
         setErrorMessage('');
         console.log('Login successful:', { email, password });
 
+        toast.success('User Login Successful')
+
         setTimeout(() => {
             navigate('/home'); // Use navigate instead of history.push
-        }, 1000);
+        }, 2000);
     };
 
     return (
@@ -34,7 +38,6 @@ const LoginForm = () => {
                             placeholder="Enter your email" 
                             value={email} 
                             onChange={(e) => setEmail(e.target.value)} 
-                            required 
                         />
                     </div>
 
@@ -45,7 +48,6 @@ const LoginForm = () => {
                             placeholder="Enter your password" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
-                            required 
                         />
                     </div>
 
@@ -57,6 +59,7 @@ const LoginForm = () => {
                     <p><a href="/forgot-password">Forgot your password?</a></p>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 };

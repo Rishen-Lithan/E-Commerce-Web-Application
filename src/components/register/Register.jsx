@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import './RegisterForm.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleLogin = (e) => {
+    const handleRegister = (e) => {
         e.preventDefault();
 
         setErrorMessage('');
+
+        setTimeout(() => {
+            toast.success('User Registration Successfully')
+        }, 2000);
         console.log('Login successful:', { email, password });
     };
 
@@ -19,7 +25,7 @@ const RegisterForm = () => {
             <h2>Register</h2>
             {errorMessage && <div className="error-message">{errorMessage}</div>}
             
-            <form onSubmit={handleLogin}>
+            <form onSubmit={handleRegister}>
             <div className="form-group">
                 <label>Email Address</label>
                 <input 
@@ -49,6 +55,7 @@ const RegisterForm = () => {
             <p>Already have an account? <a href="/">Login</a></p>
             </div>
         </div>
+        <ToastContainer />
     </div>
 
   );
