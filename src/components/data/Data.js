@@ -12,7 +12,7 @@ export const nav = [
     path: "/services",
   },
   {
-    text: "blog",
+    text: "Product",
     path: "/blog",
   },
   {
