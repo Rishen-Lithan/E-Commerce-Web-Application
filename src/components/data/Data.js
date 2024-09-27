@@ -8,7 +8,7 @@ export const nav = [
     path: "/about",
   },
   {
-    text: "services",
+    text: "categories",
     path: "/services",
   },
   {
@@ -72,6 +72,21 @@ export const featured = [
   {
     cover: "../images/hero/h4.png",
     name: "Office & Studio",
+    total: "80 Property",
+  },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
+    total: "80 Property",
+  },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
+    total: "80 Property",
+  },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
     total: "80 Property",
   },
   {
