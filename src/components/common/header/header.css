@@ -35,14 +35,73 @@ header .toggle {
   display: none;
 }
 
-.button .btn1 {
+header .btn1 {
   margin-right: 10px;
+  width: 120px;
+}
+
+header .sign-in-btn {
+  background-color: 27ae60;
+  color: #fff;
+  border: #27ae60 2px solid;
+  width: 150px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+header .sign-in-btn:hover {
+  background-color: #fff;
+  color: #27ae60;
 }
 
 .my-orders-btn {
   background-color: white;
   color: #27ae60;
   border: #27ae60 2px solid;
+  width: 200px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  header {
+    height: auto;
+    padding: 10px;
+  }
+  header img {
+    width: 140px;
+    margin-top: 20px;
+  }
+  header a {
+    margin-left: 20px;
+    font-size: 14px;
+  }
+  header .button {
+    margin-top: 10px;
+  }
+  header .nav ul.flex {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  header .nav ul.flex li {
+    margin: 10px 0px;
+  }
+  header .toggle {
+    display: none;
+  }
+  .my-orders-btn {
+    width: 100%;
+  }
+  .sign-in-btn {
+    margin-left: 5px;
+    width: 80%;
+    margin-bottom: 5px;
+  }
+  .my-orders-btn {
+    margin-left: 15px;
+  }
 }
 
 @media screen and (max-width: 768px) {

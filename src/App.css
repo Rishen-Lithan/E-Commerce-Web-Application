@@ -75,6 +75,9 @@ label {
 .mtop {
   margin-top: 50px;
 }
+.mright {
+  margin-right: 10px;
+}
 h4 {
   font-weight: 500;
   margin-top: 10px;
@@ -150,6 +153,9 @@ img {
 .back h1 {
   font-size: 40px;
   font-weight: 500;
+}
+.mb2 {
+  margin-bottom: 10px;
 }
 .mb {
   margin-bottom: 80px;

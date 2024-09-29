@@ -1,6 +1,6 @@
 import React from "react"
 
-const Back = ({ name, title, cover, button }) => {
+const TopCard = ({ name, title, cover, button }) => {
   return (
     <>
       <div className='back'>
@@ -15,4 +15,4 @@ const Back = ({ name, title, cover, button }) => {
   )
 }
 
-export default Back
+export default TopCard
