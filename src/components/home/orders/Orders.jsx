@@ -94,6 +94,9 @@ function Orders() {
   const [orders, setOrders] = useState(initialOrders);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedProductIndex, setSelectedProductIndex] = useState(null); // Track the selected product
+  const [updatedQuantity, setUpdatedQuantity] = useState(1);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [cancellationNote, setCancellationNote] = useState('');
   const [role, setRole] = useState('admin');
@@ -109,6 +112,45 @@ function Orders() {
     setCancellationNote('');
   };
 
+  const openUpdateModal = (orderId, productIndex, currentQuantity) => {
+    setSelectedOrderId(orderId);
+    setSelectedProductIndex(productIndex);
+    setUpdatedQuantity(currentQuantity); // Set the current quantity in state
+    setIsUpdateModalOpen(true);
+  };
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedOrderId(null);
+    setSelectedProductIndex(null);
+    setUpdatedQuantity(1);
+  };
+
+  const confirmUpdate = () => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) => {
+        if (order.orderId === selectedOrderId) {
+          const updatedProducts = [...order.products];
+          updatedProducts[selectedProductIndex].quantity = updatedQuantity;
+          return { ...order, products: updatedProducts };
+        }
+        return order;
+      })
+    );
+    closeUpdateModal();
+  };
+
+  const openCancelModal = (orderId) => {
+    setSelectedOrderId(orderId); // Correct line
+    setIsCancelModalOpen(true);
+  };
+  
+
+  const closeCancelModal = () => {
+    setIsCancelModalOpen(false);
+    setSelectedOrderId(null);
+  }
+
   const confirmCancellation = () => {
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
@@ -120,9 +162,34 @@ function Orders() {
     closeModal();
   };
 
+  const cancelOrder = () => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.orderId === selectedOrderId
+          ? {
+              ...order,
+              orderStatus: order.orderStatus === 'processing' ? 'delivery' : 'processing',
+            }
+          : order
+      )
+    );
+    closeCancelModal();
+};
+
+
   const modalAnimation = useSpring({
     opacity: isModalOpen ? 1 : 0,
     transform: isModalOpen ? `translateY(0%)` : `translateY(-50%)`,
+  });
+
+  const cancelModalAnimation = useSpring({
+    opacity: isCancelModalOpen ? 1 : 0,
+    transform: isCancelModalOpen ? `translateY(0%)` : `translateY(-50%)`,
+  });
+
+  const updateModalAnimation = useSpring({
+    opacity: isUpdateModalOpen ? 1 : 0,
+    transform: isUpdateModalOpen ? `translateY(0%)` : `translateY(-50%)`,
   });
 
   const getStatusColor = (status) => {
@@ -171,6 +238,10 @@ function Orders() {
     setCancellationNote(e.target.value);
   };
 
+  const handleQuantityChange = (e) => {
+    setUpdatedQuantity(parseInt(e.target.value));
+  };
+
   return (
     <div className="orders-container">
       <div className="button-container">
@@ -217,22 +288,32 @@ function Orders() {
 
             {order.orderStatus === 'processing' || order.orderStatus === 'delivery' ? (
               <>
-                <button className='update-btn' onClick={() => openModal(order.orderId)}>
+                <button
+                  className='update-btn'
+                  onClick={() => openUpdateModal(order.orderId, index, order.products[0].quantity)}
+                >
                   Update Order
                 </button>
-                <button className='cancel-btn' onClick={() => openModal(order.orderId)}>
+                <button className='cancel-btn' onClick={() => openCancelModal(order.orderId)}>
                   Cancel Order
                 </button>
               </>
             ) : null }
+
+            {order.orderStatus === 'processing' || order.orderStatus === 'delivery' && role === 'admin' || role === 'CSR' ? (
+              <button className='deliver-btn'>
+                Mark as Delivered
+              </button>
+            ) : null}
           </div>
         ))
       )}
 
+      {/* Cancellation Confirmation Modal */}
       {isModalOpen && (
         <animated.div style={modalAnimation} className="modal">
           <div className="modal-content">
-            <h3>Are you sure you want to confirm the order cancellation ?</h3>
+            <h3>Are you sure you want to confirm the order cancellation?</h3>
             <textarea
               placeholder="Leave a note about the cancellation"
               value={cancellationNote}
@@ -244,6 +325,48 @@ function Orders() {
             </button>
             <button onClick={closeModal} className="close-btn">
               No, Go Back
+            </button>
+          </div>
+        </animated.div>
+      )}
+
+      {/* Cancel Order Modal */}
+      {isCancelModalOpen && (
+        <animated.div style={cancelModalAnimation} className="modal">
+          <div className="modal-content">
+            <h3>Are you sure you want to cancel the order?</h3>
+            <textarea
+              placeholder="Leave a note about the cancellation"
+              value={cancellationNote}
+              onChange={handleNoteChange}
+              className="cancel-note"
+            />
+            <button onClick={cancelOrder} className="confirm-btn">
+              Yes, Cancel
+            </button>
+            <button onClick={closeCancelModal} className="close-btn">
+              No, Go Back
+            </button>
+          </div>
+        </animated.div>
+      )}
+
+      {isUpdateModalOpen && (
+        <animated.div style={updateModalAnimation} className="modal">
+          <div className="update-modal-content">
+            <h3>Update Quantity for Order {selectedOrderId}</h3>
+            <input
+              type="number"
+              value={updatedQuantity}
+              onChange={handleQuantityChange}
+              min="1"
+              className="quantity-input"
+            />
+            <button onClick={confirmUpdate} className="update-confirm-btn">
+              Update
+            </button>
+            <button onClick={closeUpdateModal} className="update-close-btn">
+              Cancel
             </button>
           </div>
         </animated.div>

@@ -26,3 +26,28 @@
     width: 100%;
   }
 }
+
+/* Notifications Section */
+.notifications {
+  margin-bottom: 30px;
+}
+
+.notifications h4 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #27ae60;
+}
+
+.notifications ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.notifications li {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+

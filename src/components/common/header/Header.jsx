@@ -9,7 +9,7 @@ import { useSpring, animated } from "react-spring";
 const Header = () => {
   const [navList, setNavList] = useState(false);
   const [count, setCount] = useState(4);
-  const [role, setRole] = useState("customer"); // vendor
+  const [role, setRole] = useState("vendor"); // vendor
   const [isOpen, setIsOpen] = useState(false);
 
   const initialOrders = [
@@ -94,12 +94,6 @@ const Header = () => {
           </div>
 
           <div className="button flex">
-            {role === "vendor" ? (
-              <button className="btn1 my-orders-btn">
-                <span>{count}</span> Notifications
-              </button>
-            ) : null}
-
             {role === "customer" ? (
               <button className="btn1 my-orders-btn" onClick={toggleModal}>
                 My Cart
