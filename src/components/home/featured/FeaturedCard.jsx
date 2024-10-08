@@ -1,15 +1,72 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { featured } from "../../data/Data";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSpring, animated } from 'react-spring';
+import { APP_URL } from "../../../config/config";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const FeaturedCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(3);
+  const [rating, setRating] = useState(0);
+  const [category, setCategory] = useState([]);
+  const [vendors, setVendors] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    fetch(APP_URL + 'Vendor/list', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => response.json())
+    .then((responseJson) => {
+      console.log('Vendors List Response : ', responseJson);
+      setVendors(responseJson);
+    })
+    .catch(err => console.log('Error getting vendors : ', err));
+  }, [setVendors]);
+
+  const rateVendor = (id) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    fetch(APP_URL + `Vendor/comment/${id}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        comment: comment,
+        rank: rating
+      })
+    })
+    .then(response => response.json())
+    .then((responseJson) => {
+      console.log('Rate Response : ', responseJson);
+      toast.success('Thank you for rating our vendors');
+    })
+    .catch(err => console.log('Error rating vendor : ', err));
+  }
 
   const openModal = (item) => {
     setSelectedItem(item);
@@ -66,12 +123,14 @@ const FeaturedCard = () => {
   return (
     <div className="content mtop">
       <Slider {...settings}>
-        {featured.map((items, index) => (
-          <div className="box" key={index} onClick={() => openModal(items)}>
-            <img src={items.cover} alt="" />
-            <h4>{items.name}</h4>
-            <label>{items.total}</label>
-          </div>
+        {vendors && vendors.map((cat, index) => (
+          featured[index] && (
+            <div className="box" key={index} onClick={() => openModal({ vendor: cat, featuredItem: featured[index] })}>
+              <img src={featured[index].cover} alt="Featured Cover" />
+              <h4>{cat.vendorName}</h4>
+              <label>{cat.category}</label>
+            </div>
+          )
         ))}
       </Slider>
 
@@ -82,10 +141,10 @@ const FeaturedCard = () => {
             style={modalAnimation}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2>{selectedItem.name}</h2>
+            <h2>{selectedItem.vendor.vendorName}</h2>
             <img
-              src={selectedItem.cover}
-              alt={selectedItem.name}
+              src={selectedItem.featuredItem.cover}
+              alt="Featured Cover"
               className="modal-image"
             />
             <textarea
@@ -111,12 +170,19 @@ const FeaturedCard = () => {
               onChange={(e) => setRating(e.target.value)}
               style={{ width: "100%", margin: "10px 0" }}
             />
+            
             <button className="close-btn" onClick={closeModal}>
               Close
+            </button>
+
+            <button className="close-btn" onClick={() => rateVendor(selectedItem.vendor.id)}>
+              Rate Vendor
             </button>
           </animated.div>
         </div>
       )}
+
+      <ToastContainer className="toast-container" />
 
       <style>
         {`

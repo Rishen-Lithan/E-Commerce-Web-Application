@@ -1,15 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { list } from "../../data/Data";
 import { useSpring, animated } from 'react-spring';
 import { useNavigate } from "react-router-dom";
+import { APP_URL } from "../../../config/config";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import DefaultImage from '../../images/default.jpeg';
 
 const RecentCard = () => {
-  const [role, setRole] = useState('customer');
+  const [role, setRole] = useState("");
+  const [token, setToken] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productQuantity, setProductQuantity] = useState(1);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const isAccessToken = localStorage.getItem('token');
+    console.log('Access Token : ', isAccessToken);
+    setToken(isAccessToken);
+
+    const isRole = localStorage.getItem('role');
+    console.log('User Role : ', isRole);
+    setRole(isRole);
+    
+  }, [setToken, setRole]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    fetch(APP_URL + 'Product/list', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => response.json())
+    .then((responseJson) => {
+      console.log('Products List Response : ', responseJson);
+      setProducts(responseJson);
+    })
+    .catch(err => console.log('Error getting products : ', err));
+  }, [setProducts]);
 
   const navigate = useNavigate();
 
@@ -49,7 +90,6 @@ const RecentCard = () => {
     setIsCartModalOpen(true);
     setIsProductModalOpen(false);
   };
-  
 
   const closeCartModal = () => {
     setIsCartModalOpen(false);
@@ -82,34 +122,68 @@ const RecentCard = () => {
     config: { tension: 200, friction: 15 },
   });
 
+  const saveToCart = () => {
+    const cartItem = {
+      product: selectedProduct,
+      quantity: productQuantity,
+    };
+  
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+  
+    const existingProductIndex = cart.findIndex(
+      (item) => item.product.id === selectedProduct.id
+    );
+  
+    if (existingProductIndex > -1) {
+      cart[existingProductIndex].quantity += productQuantity;
+    } else {
+      cart.push(cartItem);
+    }
+  
+    localStorage.setItem('cart', JSON.stringify(cart));
+    console.log('Product added to cart', cart);
+    toast.success('Product Added to Cart Successfully');
+
+    setTimeout(() => {
+      window.location.reload();
+      closeCartModal();
+    }, 1000);
+  };
+
   return (
     <>
       <div className='content grid3 mtop'>
-        {list.map((val, index) => {
-          const { cover, category, name, price, type, qty } = val;
+        {products.map((val, index) => {
+          const { productName, category, availableQuantity, price, description, image, stockStatus, categoryStatus } = val;
+          const imageUrl = `http://localhost:8080/images/${image}`;
           return (
             <div className='box shadow' key={index} onClick={() => handleProductClick(val)}>
               <div className='img'>
-                <img src={cover} alt='' />
+                <img
+                  src={imageUrl}
+                  alt='Product Image'
+                  className="p-image"
+                  onError={(e) => { e.target.src = DefaultImage; }}
+                />
               </div>
               <div className='text'>
                 <div className='category flex mb2'>
                   <span
                     style={{
                       background:
-                        category === "In Stock" ? "#25b5791a" :
-                        category === "Low Stock" ? "#ff98001a" :
+                        stockStatus === 1 ? "#25b5791a" :
+                        stockStatus === 2 ? "#ff98001a" :
                         "#f1948a1a",
                       color:
-                        category === "In Stock" ? "#25b579" :
-                        category === "Low Stock" ? "#ff9800" :
+                        stockStatus === 1 ? "#25b579" :
+                        stockStatus === 2 ? "#ff9800" :
                         "#f1948a"
                     }}
                   >
-                    {category}
+                    {stockStatus === 1 ? "In Stock" : stockStatus === 2 ? 'Low Stock' :  "Out of Stock"}
                   </span>
 
-                  {role === 'vendor' ? (
+                  {role === 'Vendor' ? (
                     <i className="fa-regular fa-pen-to-square" style={{ cursor: 'pointer' }} onClick={handleEdit}></i>
                   ) : (
                     category === 'Out of Stock' ? (
@@ -120,23 +194,23 @@ const RecentCard = () => {
                   )}
                 </div>
 
-                {role === 'vendor' ? (
+                {role === 'Vendor' ? (
                   <div className="flex">
-                    <h4>{name}</h4>
+                    <h4>{productName}</h4>
                     <i className="fa-solid fa-trash" style={{ color: '#cd6155', cursor: 'pointer' }} onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(val);
                     }}></i>
                   </div>
                 ) : (
-                  <h4>{name}</h4>
+                  <h4>{productName}</h4>
                 )}
               </div>
               <div className='button flex'>
                 <div>
-                  <button className='btn2'>{price}</button> <label htmlFor=''>/ {qty} Qty.</label>
+                  <button className='btn2'>{price}</button> <label htmlFor=''>/ {availableQuantity} Qty.</label>
                 </div>
-                <span>{type}</span>
+                <span>{category}</span>
               </div>
             </div>
           )
@@ -163,7 +237,7 @@ const RecentCard = () => {
             <img src={selectedProduct.cover} alt={selectedProduct.name} style={{ width: '100%', height: 'auto' }} />
             <div className="text-content">
               <p><strong>Name:</strong></p>
-              <p>{selectedProduct.name}</p>
+              <p>{selectedProduct.productName}</p>
             </div>
             <div className="text-content">
               <p><strong>Price:</strong></p>
@@ -175,11 +249,7 @@ const RecentCard = () => {
             </div>
             <div className="text-content">
               <p><strong>Quantity:</strong></p>
-              <p>{selectedProduct.qty}</p>
-            </div>
-            <div className="text-content">
-              <p><strong>Type:</strong></p>
-              <p>{selectedProduct.type}</p>
+              <p>{selectedProduct.availableQuantity}</p>
             </div>
             <button onClick={closeProductModal} className="close-btn" style={{ width: '100%'}}>Close</button>
           </animated.div>
@@ -193,7 +263,7 @@ const RecentCard = () => {
             <img src={selectedProduct.cover} alt={selectedProduct.name} style={{ width: '100%', height: 'auto' }} />
             <div className="text-content">
               <p><strong>Name:</strong></p>
-              <p>{selectedProduct.name}</p>
+              <p>{selectedProduct.productName}</p>
             </div>
 
             <div className="text-content">
@@ -202,11 +272,11 @@ const RecentCard = () => {
             </div>
               
               <div className="quantity-controls">
-                <button onClick={decreaseQuantity}>-</button>
-                <span>{productQuantity}</span>
-                <button onClick={increaseQuantity}>+</button>
+                <button onClick={decreaseQuantity} className="count-btn">-</button>
+                <span style={{ marginRight: '10px'}}>{productQuantity}</span>
+                <button onClick={increaseQuantity} className="count-btn">+</button>
               </div>
-            <button onClick={closeCartModal} className="close-btn" style={{ width: '100%' }}>Add to Cart</button>
+            <button onClick={saveToCart} className="close-btn" style={{ width: '100%' }}>Add to Cart</button>
             <button onClick={closeCartModal} className="cancel-btn" style={{ width: '100%' }}>Close</button>
           </animated.div>
         </div>
@@ -296,6 +366,7 @@ const RecentCard = () => {
           }
         `}
       </style>
+      <ToastContainer className="toast-container" />
     </>
   );
 };

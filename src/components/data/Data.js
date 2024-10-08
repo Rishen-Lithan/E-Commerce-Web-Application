@@ -15,10 +15,6 @@ export const nav = [
     text: "Product",
     path: "/blog",
   },
-  // {
-  //   text: "pricing",
-  //   path: "/pricing",
-  // },
   {
     text: "contact",
     path: "/contact",
@@ -36,7 +32,7 @@ export const customerNav = [
   },
   {
     text: "Vendors",
-    path: "/services",
+    path: "/vendors",
   },
   {
     text: "Product",
@@ -63,7 +59,7 @@ export const adminNav = [
   },
   {
     text: "Orders",
-    path: "/orders",
+    path: "/all-Orders",
   },
   {
     text: "Product",
@@ -76,6 +72,25 @@ export const adminNav = [
   {
     text: "Category",
     path: "/categories",
+  },
+]
+
+export const csrNav = [
+  {
+    text: "home",
+    path: "/home",
+  },
+  {
+    text: "about",
+    path: "/about",
+  },
+  {
+    text: "Orders",
+    path: "/all-Orders",
+  },
+  {
+    text: "Product",
+    path: "/blog",
   },
 ]
 

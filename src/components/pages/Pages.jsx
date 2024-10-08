@@ -16,6 +16,11 @@ import OrdersPage from "../home/orders/OrdersPage";
 import Vendors from "../vendors/Vendors";
 import AddVendors from "../vendors/AddVendors";
 import Category from "../categories/Category";
+import Users from "../users/Users";
+import ListVendors from "../vendors/ListVendors";
+import VendorComments from "../vendors/VendorComments";
+import AllOrders from '../orders/OrdersPage';
+import CancelRequests from "../orders/CancelRequests";
 
 const Pages = () => {
   const location = useLocation(); 
@@ -30,6 +35,7 @@ const Pages = () => {
   return (
     <>
       {!isLoginPage && !isRegisterPage && !isAddProducts && !isEditProducts && !isAddVendorPage && <Header />}
+      
       
       <Routes>
         <Route path="/" element={<LoginForm />} />
@@ -46,9 +52,13 @@ const Pages = () => {
         <Route path="/edit-Product" element={<EditProducts />} />
         <Route path="/add-Vendor" element={<AddVendors />} />
         <Route path="/categories" element={<Category />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/all-Orders" element={<AllOrders />} />
+        <Route path="/list-Vendors" element={<ListVendors />} />
+        <Route path="/cancel-requests" element={<CancelRequests />} />
+        <Route path="/vendor-comments/:vendorId" element={<VendorComments />} />
       </Routes>
       
-      {/* Render Footer only if not on Login or Register page */}
       {!isLoginPage && !isRegisterPage && !isAddProducts && !isEditProducts && !isOrdersPage && !isAddVendorPage && <Footer />}
     </>
   );

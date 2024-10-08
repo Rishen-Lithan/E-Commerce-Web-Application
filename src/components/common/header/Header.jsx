@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./header.css";
-import { nav, adminNav, customerNav } from "../../data/Data";
+import { nav, adminNav, customerNav, csrNav } from "../../data/Data";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,53 +9,114 @@ import { useSpring, animated } from "react-spring";
 const Header = () => {
   const [navList, setNavList] = useState(false);
   const [count, setCount] = useState(4);
-  const [role, setRole] = useState("vendor"); // vendor
+  const [role, setRole] = useState("");
+  const [token, setToken] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryNote, setDeliveryNote] = useState('');
 
-  const initialOrders = [
-    {
-      products: [
-        {
-          productImage: "https://via.placeholder.com/100",
-          productName: "Product 1",
-          productId: "12345",
-          productCategory: "Category A",
-          quantity: 2,
-        },
-      ],
-    },
-    {
-      products: [
-        {
-          productImage: "https://via.placeholder.com/100",
-          productName: "Product 2",
-          productId: "67890",
-          productCategory: "Category B",
-          quantity: 1,
-        },
-        {
-          productImage: "https://via.placeholder.com/100",
-          productName: "Product 3",
-          productId: "54321",
-          productCategory: "Category C",
-          quantity: 3,
-        },
-      ],
-    },
-  ];
-
-  const [orders, setOrders] = useState(initialOrders);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const isAccessToken = localStorage.getItem('token');
+    console.log('Access Token : ', isAccessToken);
+    setToken(isAccessToken);
+
+    const isRole = localStorage.getItem('role');
+    console.log('User Role : ', isRole);
+    setRole(isRole);
+    
+  }, []);
+
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');    
+  
     toast.success("User Logout Successfully");
+    
     setTimeout(() => {
       navigate("/");
     }, 2000);
   };
 
-  const toggleModal = () => setIsOpen(!isOpen);
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    console.log('Cart Data : ', cart);
+    setOrders(cart);
+  }, [setOrders]);
 
+  const toggleModal = () => {
+    setIsOpen(prev => !prev);
+  };
+
+  const clearCart = () => {
+    setOrders([]);
+    localStorage.removeItem('cart');
+    toast.success('Cart Cleared Successfully');
+    console.log('Cart has been cleared and modal closed');
+    window.location.reload();
+  };
+  
+  const createOrder = async () => {
+    const orderItems = orders.map(order => ({
+      productId: order.product.id,           
+      productName: order.product.productName,
+      quantity: order.quantity,
+      unitPrice: order.product.price,
+      vendorId: order.product.vendorId,
+      vendorEmail: order.product.vendorEmail
+    }));
+  
+    const orderData = {
+      paymentMethod: 1,
+      note: deliveryNote,
+      deliveryAddress: deliveryAddress,
+      orderItems: orderItems
+    };
+  
+    try {
+      const response = await fetch('http://localhost:8080/api/Order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+  
+      if (response.ok) {
+        const contentType = response.headers.get('content-type');
+  
+        let result;
+        if (contentType && contentType.includes('application/json')) {
+          result = await response.json();
+          toast.success('Order placed successfully!');
+        } else {
+          result = await response.text();
+          toast.success(result);
+        }
+        
+        localStorage.removeItem('cart');
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        toast.error(`Order failed: ${error.message}`);
+      }
+    } catch (err) {
+      console.error('Error placing order:', err);
+      toast.error('An error occurred while placing the order.');
+    }
+  };
+
+  const handleAddressChange = (e) => {
+    setDeliveryAddress(e.target.value);
+  };
+
+  const handleDeliveryNote = (e) => {
+    setDeliveryNote(e.target.value);
+  }
+  
   const modalAnimation = useSpring({
     opacity: isOpen ? 1 : 0,
     transform: isOpen ? `translateY(0%)` : `translateY(-100%)`,
@@ -71,20 +132,26 @@ const Header = () => {
           </div>
           <div className="nav">
             <ul className={navList ? "small" : "flex"}>
-              {role === "admin" ? (
+              {role === "Admin" ? (
                 adminNav.map((list, index) => (
                   <li key={index}>
                     <Link to={list.path}>{list.text}</Link>
                   </li>
                 ))
-              ) : role === "customer" ? (
+              ) : role === "User" ? (
                 customerNav.map((list, index) => (
                   <li key={index}>
                     <Link to={list.path}>{list.text}</Link>
                   </li>
                 ))
-              ) : (
+              ) : role === "Vendor" ? (
                 nav.map((list, index) => (
+                  <li key={index}>
+                    <Link to={list.path}>{list.text}</Link>
+                  </li>
+                ))
+              ) : (
+                csrNav.map((list, index) => (
                   <li key={index}>
                     <Link to={list.path}>{list.text}</Link>
                   </li>
@@ -94,7 +161,7 @@ const Header = () => {
           </div>
 
           <div className="button flex">
-            {role === "customer" ? (
+            {role === "User" ? (
               <button className="btn1 my-orders-btn" onClick={toggleModal}>
                 My Cart
               </button>
@@ -111,7 +178,7 @@ const Header = () => {
             </button>
           </div>
         </div>
-        <ToastContainer />
+        <ToastContainer className="toast-container" />
       </header>
 
       {/* Modal for Cart Products */}
@@ -125,30 +192,59 @@ const Header = () => {
               </button>
             </div>
             <div className="modal-body">
-              {orders.map((order, orderIndex) => (
-                <div key={orderIndex} className="order-section">
-                  {order.products.map((product, productIndex) => (
-                    <div key={productIndex} className="product-item">
-                      <img
-                        src={product.productImage}
-                        alt={product.productName}
-                        className="product-image"
-                      />
-                      <div className="product-details">
-                        <p><strong>Name:</strong> {product.productName}</p>
-                        <p><strong>Category:</strong> {product.productCategory}</p>
-                        <p><strong>Quantity:</strong> {product.quantity}</p>
+              {orders && orders.length > 0 ? (
+                <>
+                  {orders.map((order, orderIndex) => {
+                    const imageUrl = `http://localhost:8080/images/${order.product.image}`;
+
+                    return (
+                      <div key={orderIndex} className="order-section">
+                        <div className="product-item">
+                          <img
+                            src={imageUrl}
+                            alt={order.product.productName}
+                            className="product-image"
+                          />
+                          <div className="product-details">
+                            <p><strong>Name:</strong> {order.product.productName}</p>
+                            <p><strong>Category:</strong> {order.product.category}</p>
+                            <p><strong>Price:</strong> ${order.product.price}</p>
+                            <p><strong>Quantity:</strong> {order.quantity}</p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
+                    );
+                  })}
+
+                  <textarea
+                    placeholder="Enter Your Delivery Address"
+                    className="cancel-note"
+                    value={deliveryAddress}
+                    onChange={handleAddressChange}
+                  />
+
+                  <textarea
+                    placeholder="Enter Your Delivery Note"
+                    className="cancel-note"
+                    value={deliveryNote}
+                    onChange={handleDeliveryNote}
+                  />
+                </>
+              ) : (
+                <p>No products in the cart.</p>
+              )}
             </div>
-            <div className="modal-footer">
-              <button className="purchaseBtn" onClick={toggleModal}>
-                Purchase Order
-              </button>
-            </div>
+
+            {orders && orders.length > 0 && (
+              <div className="modal-footer">
+                <button className="purchaseBtn" onClick={clearCart}>
+                  Clear Cart
+                </button>
+                <button className="purchaseBtn" onClick={createOrder}>
+                  Purchase Order
+                </button>
+              </div>
+            )}
           </div>
         </animated.div>
       )}
@@ -227,32 +323,26 @@ const Header = () => {
 
         .modal-footer {
           display: flex;
+          gap: 10px; /* Adds spacing between buttons */
           padding-top: 10px;
           border-top: 1px solid #eee;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
+          justify-content: space-between;
+        }
+
+        .purchaseBtn, .closeBtn {
+          background: #27ae60;
+          color: white;
+          border: none;
+          cursor: pointer;
+          font-size: 14px;
+          border-radius: 5px;
+          padding: 10px 0;
+          flex: 1; /* Makes buttons take equal width */
+          text-align: center;
         }
 
         .purchaseBtn {
-          background: #27ae60;
-          color: white;
-          border: none;
-          padding: 10px 15px;
-          cursor: pointer;
-          font-size: 14px;
-          border-radius: 5px;
-          width: 100%;
-        }
-
-        .closeBtn, .close {
-          background: #27ae60;
-          color: white;
-          border: none;
-          padding: 10px 15px;
-          cursor: pointer;
-          font-size: 14px;
-          border-radius: 5px;
+          background-color: #27ae60; /* Change background color for this button */
         }
 
         .close {
@@ -261,6 +351,7 @@ const Header = () => {
           color: #27ae60;
         }
       `}</style>
+
     </>
   );
 };

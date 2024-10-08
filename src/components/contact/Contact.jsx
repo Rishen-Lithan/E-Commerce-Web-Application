@@ -1,16 +1,48 @@
-import React, { useState } from "react"
-import img from "../images/pricing.jpg"
-import Back from "../common/Back"
-import "./contact.css"
+import React, { useState, useEffect } from "react";
+import img from "../images/pricing.jpg";
+import Back from "../common/Back";
+import { APP_URL } from '../../config/config';
+import './contact.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Contact = () => {
-  // Sample notifications data
-  const [notifications] = useState([
-    "Your order #A001 has been shipped.",
-    "New product updates are available.",
-    "Your password was successfully changed.",
-    "Reminder: Complete your profile for more benefits.",
-  ])
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Function to fetch notifications
+  const fetchNotifications = () => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      toast.error('No token found');
+      return;
+    }
+
+    fetch(`${APP_URL}CancelNotification/user-notifications`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        setNotifications(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching notifications:', error);
+        toast.error('Error fetching notifications');
+        setLoading(false);
+      });
+  };
+
+  // useEffect to fetch data when component mounts
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   return (
     <>
@@ -21,11 +53,22 @@ const Contact = () => {
             {/* Notifications Section */}
             <div className='notifications'>
               <h4>Notifications</h4>
-              <ul>
-                {notifications.map((notification, index) => (
-                  <li key={index}>{notification}</li>
-                ))}
-              </ul>
+              {loading ? (
+                <p>Loading notifications...</p>
+              ) : (
+                <div className='notifications-list'>
+                  {notifications.length === 0 ? (
+                    <p>No notifications available.</p>
+                  ) : (
+                    notifications.map(notification => (
+                      <div key={notification.id} className='notification-card'>
+                        <p><strong>Order ID:</strong> {notification.orderId}</p>
+                        <p><strong>Message:</strong> {notification.message}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Contact Form */}
@@ -41,9 +84,10 @@ const Contact = () => {
             </form>
           </div>
         </div>
+        <ToastContainer />
       </section>
     </>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

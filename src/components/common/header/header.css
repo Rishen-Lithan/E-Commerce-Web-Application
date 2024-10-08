@@ -65,6 +65,15 @@ header .sign-in-btn:hover {
   font-size: 14px;
 }
 
+.toast-container {
+  z-index: 10000; /* Ensure it's on top of all elements */
+  position: fixed;
+  top: 20px; /* Adjust the top position */
+  right: 20px; /* Adjust the right position */
+  width: auto;
+  max-width: 400px;
+}
+
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   header {
     height: auto;
@@ -95,7 +104,7 @@ header .sign-in-btn:hover {
     width: 100%;
   }
   .sign-in-btn {
-    margin-left: 5px;
+    margin-left: 15px;
     width: 80%;
     margin-bottom: 5px;
   }

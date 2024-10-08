@@ -1,0 +1,43 @@
+.cancel-requests-container {
+    padding: 20px;
+  }
+  
+  .cancel-requests-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .cancel-request-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cancel-request-card p {
+    margin: 10px 0;
+  }
+  
+  .confirm-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .confirm-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .confirm-btn:hover {
+    background-color: #45a049;
+  }
+  
