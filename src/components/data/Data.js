@@ -19,6 +19,10 @@ export const nav = [
     text: "contact",
     path: "/contact",
   },
+  {
+    text: "Orders",
+    path: "/vendor-orders"
+  }
 ]
 
 export const customerNav = [

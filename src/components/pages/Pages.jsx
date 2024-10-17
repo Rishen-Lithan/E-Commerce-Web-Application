@@ -21,6 +21,7 @@ import ListVendors from "../vendors/ListVendors";
 import VendorComments from "../vendors/VendorComments";
 import AllOrders from '../orders/OrdersPage';
 import CancelRequests from "../orders/CancelRequests";
+import VendorOrdersView from "../vendor-orders/VendorOrdersView";
 
 const Pages = () => {
   const location = useLocation(); 
@@ -57,6 +58,7 @@ const Pages = () => {
         <Route path="/list-Vendors" element={<ListVendors />} />
         <Route path="/cancel-requests" element={<CancelRequests />} />
         <Route path="/vendor-comments/:vendorId" element={<VendorComments />} />
+        <Route path="/vendor-orders" element={<VendorOrdersView />} />
       </Routes>
       
       {!isLoginPage && !isRegisterPage && !isAddProducts && !isEditProducts && !isOrdersPage && !isAddVendorPage && <Footer />}

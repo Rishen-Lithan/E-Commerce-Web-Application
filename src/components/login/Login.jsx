@@ -6,8 +6,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { APP_URL } from '../../config/config';
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    // Admin - admin.test@example.com
+    // Vendor - vendor.test@gmail.com
+    // CSR - abc@gmail.com
+    // User - ab@gmail.com
+    // Vendor - vendorc@example.com - Password123!
+    const [email, setEmail] = useState('vendorc@example.com');
+    const [password, setPassword] = useState('Password123!');
     const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();

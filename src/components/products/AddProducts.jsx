@@ -4,6 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { APP_URL } from '../../config/config';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { app } from '../../firebase';
 
 function AddProducts() {
   const [productName, setProductName] = useState('');
@@ -16,10 +19,12 @@ function AddProducts() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [vendors, setVendors] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState('');
-  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
 
+  // Fetch categories
   useEffect(() => {
     const token = localStorage.getItem('token');
     
@@ -38,12 +43,12 @@ function AddProducts() {
     })
     .then(response => response.json())
     .then((responseJson) => {
-      console.log('Product Categories : ', responseJson);
       setCategories(responseJson);
     })
     .catch(err => console.log('Error getting product categories : ', err));
-  }, [setCategories]);
+  }, []);
 
+  // Fetch vendors
   useEffect(() => {
     const token = localStorage.getItem('token');
     
@@ -62,12 +67,37 @@ function AddProducts() {
     })
     .then(response => response.json())
     .then((responseJson) => {
-      console.log('Vendors List : ', responseJson);
       setVendors(responseJson);
     })
     .catch(err => console.log('Error getting vendors list : ', err));
-  }, [setVendors]);
+  }, []);
 
+  // Function to store image in Firebase Storage
+  const storeImage = async (file) => {
+    return new Promise((resolve, reject) => {
+      const storage = getStorage(app);
+      const fileName = new Date().getTime() + file.name;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+
+  // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -78,23 +108,31 @@ function AddProducts() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('productName', productName);
-    formData.append('price', price);
-    formData.append('availableQuantity', availableQuantity);
-    formData.append('category', selectedCategory);
-    formData.append('description', description);
-    if (image) {
-      formData.append('imageFile', image);
+    if (!imageFile) {
+      toast.error('Please upload a product image.');
+      return;
     }
 
     try {
+      setUploading(true);
+
+      const imageUrl = await storeImage(imageFile);
+      setUploading(false);
+
       const response = await fetch(APP_URL + 'Product/create', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData
+        body: JSON.stringify({
+          productName: productName,
+          price: price,
+          availableQuantity: availableQuantity,
+          category: selectedCategory,
+          description: description,
+          ImageUrl: imageUrl
+        })
       });
 
       if (!response.ok) {
@@ -105,6 +143,9 @@ function AddProducts() {
       }
 
       const result = await response.json();
+
+      console.log('Result : ', result);
+      
       toast.success('Product Added Successfully');
       setTimeout(() => {
           navigate('/blog');
@@ -181,7 +222,8 @@ function AddProducts() {
           <input 
             type="file" 
             className="add-products__input" 
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={(e) => setImageFile(e.target.files[0])}
+            accept='image/*'
           />
         </div>
 

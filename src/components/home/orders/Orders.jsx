@@ -38,7 +38,8 @@ function Orders() {
     .then(response => response.json())
     .then((responseJson) => {
       console.log('User Orders : ', responseJson);
-      setOrders(responseJson);
+      const filteredOrders = responseJson.filter(order => order.orderStatus !== 3)
+      setOrders(filteredOrders);
     })
     .catch(error => console.log('Error getting user orders : ', error));
   };
@@ -174,7 +175,7 @@ function Orders() {
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
-        note: cancellationNote // Pass the cancellation note in the body
+        note: cancellationNote
       }),
     })
       .then((response) => {
@@ -188,7 +189,6 @@ function Orders() {
         toast.success(data);
         fetchOrders();
   
-        // Close the modal
         closeCancelModal();
       })
       .catch((error) => {
@@ -274,7 +274,9 @@ function Orders() {
 
   return (
     <div className="orders-container">
-      <p className='notice'>Your Orders which are requested to cancel are still appearing here. When the CSR accept cancellation, it will move to the cancel orders</p>
+      <p className="notice">
+        Your Orders which are requested to cancel are still appearing here. When the CSR accepts the cancellation, it will move to the canceled orders.
+      </p>
       <div className="button-container">
         <button onClick={sortOrdersByStatus} className="sort-button">
           Sort by Status
@@ -284,66 +286,86 @@ function Orders() {
       {Array.isArray(orders) && orders.length === 0 ? (
         <p className="no-orders-message">No orders available.</p>
       ) : (
-        Array.isArray(orders) && orders.map((order, index) => (
+        Array.isArray(orders) &&
+        orders.map((order, index) => (
           <div key={index} className="order-card">
             <h2>Order ID: {order.orderId}</h2>
-
             <p style={{ color: getStatusColor(order.orderStatus) }}>
-              <strong>Status : </strong> 
-              {order.orderStatus === 0 ? 'Pending' : 
-                order.orderStatus === 1 ? 'Dispatched' : 
-                  order.orderStatus === 2 ? 'Completed' : 'Cancelled'}
+              <strong>Status: </strong>
+              {order.orderStatus === 0
+                ? "Pending / Processing"
+                : order.orderStatus === 1
+                ? "Dispatched"
+                : order.orderStatus === 2
+                ? "Completed"
+                : order.orderStatus === 3
+                ? "Cancelled"
+                : order.orderStatus == 4
+                ? "Requested to Cancel"
+                : "Partially Deliverd"}
             </p>
 
             {order.orderItems.map((product, productIndex) => (
               <div key={productIndex} className="product-card">
                 <div className="product-details">
                   <h3 className="product-name">Product Name: {product.productName}</h3>
-                  <p><strong>Total Amount:</strong> LKR {Number(product.totalPrice).toFixed(2)}</p>
-                  <p><strong>Unit Price:</strong> LKR {Number(product.unitPrice).toFixed(2)}</p>
-                  <p><strong>Quantity:</strong> {product.quantity}</p>
+                  <p>
+                    <strong>Total Amount:</strong> LKR {Number(product.totalPrice).toFixed(2)}
+                  </p>
+                  <p>
+                    <strong>Unit Price:</strong> LKR {Number(product.unitPrice).toFixed(2)}
+                  </p>
+                  <p>
+                    <strong>Quantity:</strong> {product.quantity}
+                  </p>
                 </div>
                 <div className="product-details">
-                  <p><strong>Order Date :</strong> {new Date(order.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                  <p><strong>Vendor :</strong> {product.vendorEmail}</p>
-                  <p><strong>Delivery Address :</strong> {order.deliveryAddress}</p>
-                  <p><strong>Delivery Note :</strong> {order.note}</p>
+                  <p>
+                    <strong>Order Date:</strong>{" "}
+                    {new Date(order.orderDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <p>
+                    <strong>Vendor:</strong> {product.vendorEmail}
+                  </p>
+                  <p>
+                    <strong>Delivery Address:</strong> {order.deliveryAddress}
+                  </p>
+                  <p>
+                    <strong>Delivery Note:</strong> {order.note}
+                  </p>
                 </div>
               </div>
             ))}
 
-            {order.orderStatus === 'Request to cancel' && role === 'admin' ? (
-              <button
-                className='cancel-btn'
-                onClick={() => openModal(order.orderId)}
-              >
+            {order.orderStatus === 0 && (
+              <div className="order-actions">
+                <button
+                  className="update-btn"
+                  onClick={() =>
+                    openUpdateModal(order.id, order.orderItems[0].quantity, order.note, order.deliveryAddress)
+                  }
+                >
+                  Update Order
+                </button>
+                <button className="cancel-btn" onClick={() => openCancelModal(order.id)}>
+                  Cancel Order
+                </button>
+              </div>
+            )}
+
+            {order.orderStatus === "Request to cancel" && role === "admin" && (
+              <button className="cancel-btn" onClick={() => openModal(order.orderId)}>
                 Confirm Cancellation
               </button>
-            ) : null}
+            )}
 
-            {(order.orderStatus === 0) ? (
-              <>
-              {order.orderItems.map((product) => (
-                <>
-                  <button
-                    className='update-btn'
-                    onClick={() => openUpdateModal(order.id, product.quantity, order.note, order.deliveryAddress)}
-                  >
-                    Update Order
-                  </button>
-                  <button className='cancel-btn' onClick={() => openCancelModal(order.id)}>
-                    Cancel Order
-                  </button>
-                </>
-              ))}
-                
-              </>
-            ) : null}
-
-            {(order.orderStatus === 'processing' || order.orderStatus === 'delivery') && (role === 'admin' || role === 'CSR') ? (
-              <button className='deliver-btn'>
-                Mark as Delivered
-              </button>
+            {(order.orderStatus === "processing" || order.orderStatus === "delivery") &&
+            (role === "admin" || role === "CSR") ? (
+              <button className="deliver-btn">Mark as Delivered</button>
             ) : null}
           </div>
         ))
@@ -379,11 +401,11 @@ function Orders() {
               onChange={handleCancelOrderNoteChange}
               className="cancel-note"
             />
-            <button onClick={cancelOrder} className="confirm-btn">
-              Yes, Cancel
-            </button>
             <button onClick={closeCancelModal} className="close-btn">
               No, Go Back
+            </button>
+            <button onClick={cancelOrder} className="confirm-btn">
+              Yes, Cancel
             </button>
           </div>
         </animated.div>
@@ -393,7 +415,7 @@ function Orders() {
         <animated.div style={updateModalAnimation} className="modal">
           <div className="update-modal-content">
             <h3>Update your Order before dispatch</h3>
-            
+
             <input
               type="number"
               value={updatedQuantity}
@@ -415,7 +437,7 @@ function Orders() {
               onChange={handleAddressChange}
               className="cancel-note"
             />
-            
+
             <button onClick={confirmUpdate} className="update-confirm-btn">
               Update
             </button>
@@ -425,8 +447,8 @@ function Orders() {
           </div>
         </animated.div>
       )}
-      
     </div>
+
   );
 }
 

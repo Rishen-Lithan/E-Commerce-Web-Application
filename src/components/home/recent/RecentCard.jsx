@@ -54,17 +54,44 @@ const RecentCard = () => {
 
   const navigate = useNavigate();
 
-  const handleEdit = () => {
-    navigate('/edit-Product');
-  };
+  const handleEdit = (product) => {
+    navigate('/edit-Product', { state: { product } });
+  };  
 
   const handleDelete = (item) => {
+    console.log('Selected Product:', item);
     setSelectedProduct(item);
     setIsDeleteModalOpen(true);
-  };
+  };  
 
-  const confirmDelete = () => {
-    console.log("Deleted item:", selectedProduct);
+  const confirmDelete = (_id) => {
+    fetch(APP_URL + `Product/delete/${_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then((response) => {
+      if (!response.ok) {
+        return response.text().then((errorMessage) => {
+          throw new Error(errorMessage);
+        });
+      }
+      return response.json();
+    })
+    .then((responseJson) => {
+      console.log('Product Delete Response : ', responseJson);
+      toast.success('Product Deleted Successfully');
+      setProducts(products.filter(product => product._id !== _id));
+      window.location.reload();
+    })
+    .catch((err) => {
+      console.log('Error deleting product : ', err.message);
+      toast.error(err.message);
+    });
+  
     setIsDeleteModalOpen(false);
   };
 
@@ -154,8 +181,9 @@ const RecentCard = () => {
     <>
       <div className='content grid3 mtop'>
         {products.map((val, index) => {
-          const { productName, category, availableQuantity, price, description, image, stockStatus, categoryStatus } = val;
+          const { productName, category, availableQuantity, price, description, image, stockStatus, categoryStatus, cover, _id } = val;
           const imageUrl = `http://localhost:8080/images/${image}`;
+          
           return (
             <div className='box shadow' key={index} onClick={() => handleProductClick(val)}>
               <div className='img'>
@@ -184,7 +212,7 @@ const RecentCard = () => {
                   </span>
 
                   {role === 'Vendor' ? (
-                    <i className="fa-regular fa-pen-to-square" style={{ cursor: 'pointer' }} onClick={handleEdit}></i>
+                    <i className="fa-regular fa-pen-to-square" style={{ cursor: 'pointer' }} onClick={() => handleEdit(val)}></i>
                   ) : (
                     category === 'Out of Stock' ? (
                       null
@@ -217,13 +245,17 @@ const RecentCard = () => {
         })}
       </div>
 
-      {isDeleteModalOpen && (
+      {isDeleteModalOpen && selectedProduct && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
           <animated.div className="modal-content" style={deleteModalAnimation} onClick={(e) => e.stopPropagation()}>
             <h2>Confirm Delete</h2>
             <p>Are you sure you want to delete this item?</p>
+            
             <div className="modal-actions">
-              <button onClick={confirmDelete} className="confirm-btn">Yes, Delete</button>
+              <button onClick={() => confirmDelete(selectedProduct.id)} className="confirm-btn">
+                Yes, Delete
+              </button>
+
               <button onClick={closeDeleteModal} className="cancel-btn">Cancel</button>
             </div>
           </animated.div>
@@ -323,7 +355,7 @@ const RecentCard = () => {
             justify-content: center;
             gap: 15px;
           }
-          .close-btn, .confirm-btn, .cancel-btn {
+          .close-btn, .confirm-btn {
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #27ae60;
@@ -332,13 +364,12 @@ const RecentCard = () => {
             border-radius: 5px;
             cursor: pointer;
           }
-          .confirm-btn {
-            background-color: #27ae60;
-          }
           .cancel-btn {
             background-color: #FFF;
             color: #27ae60;
-            border: 1px solid #27ae60
+            border: 1px solid #27ae60;
+            margin-top: 20px;
+            padding: 10px 30px;
           }
           .text-content {
             display: flex;

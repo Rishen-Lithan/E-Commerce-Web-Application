@@ -1,54 +1,81 @@
 import React, { useState, useEffect } from "react";
-import { featured } from "../data/Data"; // Assuming featured array has the cover images
 import Slider from "react-slick";
 import { useSpring, animated } from 'react-spring';
 import './CategoryModal.css';
-import { APP_URL } from '../../config/config'; // Update this path accordingly
+import { APP_URL } from '../../config/config';
+import { toast } from "react-toastify";
 
 const CategoryCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [status, setStatus] = useState('');
-  const [categories, setCategories] = useState([]); // State for categories
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(null);
 
   // Fetch categories from the API
-  useEffect(() => {
-    const fetchCategories = () => {
-      const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+  const fetchCategories = () => {
+    const token = localStorage.getItem('token');
 
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
 
-      fetch(`${APP_URL}Category/list`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+    setToken(token);
+
+    fetch(`${APP_URL}Category/list`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Category List Response : ', data);
+        setCategories(data);
+        setLoading(false);
       })
-        .then(response => response.json())
-        .then(data => {
-          setCategories(data); // Set fetched categories
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching categories:', error);
-          setLoading(false);
-        });
-    };
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+        setLoading(false);
+      });
+  };
 
+  useEffect(() => {
     fetchCategories();
   }, []);
 
+  const updateCategoryStatus = (name, status) => {
+    fetch(APP_URL + 'Product/category-status', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        category: name,
+        categoryStatus : status === 0 ? 1 : 0
+      })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log('Category Update Status Response : ', responseJson);
+      toast.success('Category updated Successfully');
+      fetchCategories();
+      closeModal()
+    })
+    .catch((err) => {
+      console.log('Error updating category status : ', err);
+      toast.error('Failed to update Category Status');
+      closeModal()
+    })
+  }
+
   const openModal = (index) => {
-    const selectedCategory = {
-      ...featured[index],
-      categoryName: categories[index]?.categoryName || "Unknown Category"
-    };
+    const selectedCategory = categories[index];
     setSelectedItem(selectedCategory);
     setIsModalOpen(true);
   };
@@ -99,16 +126,15 @@ const CategoryCard = () => {
   };
 
   if (loading) {
-    return <div>Loading categories...</div>; // Display loading state
+    return <div>Loading categories...</div>;
   }
 
   return (
     <div className="content mtop">
       <Slider {...settings}>
-        {featured.map((items, index) => (
-          <div className="box" key={index} onClick={() => openModal(index)}>
-            <img src={items.cover} alt="" />
-            <h4>{categories[index]?.categoryName || "Unknown Category"}</h4> {/* Display category name */}
+        {categories.map((category, index) => (
+          <div className="box" key={category.id} onClick={() => openModal(index)}>
+            <h4>{category.categoryName}</h4>
           </div>
         ))}
       </Slider>
@@ -120,15 +146,14 @@ const CategoryCard = () => {
             style={modalAnimation}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2>{selectedItem.categoryName}</h2> {/* Display category name in modal */}
-            <img
-              src={selectedItem.cover}
-              alt={selectedItem.categoryName}
-              className="category-modal-image"
-            />
-           
-            <button className={status === 'active' ? 'deactivate-btn' : 'close-btn'} onClick={closeModal}>
-              {status === 'active' ? 'Deactivate' : 'Activate'}
+            <h2>{selectedItem.categoryName}</h2>
+            <p>Status: {selectedItem.status === 1 ? 'Active' : 'Inactive'}</p>
+
+            <button
+              className={selectedItem.status === 1 ? 'deactivate-btn' : 'close-btn'}
+              onClick={() => updateCategoryStatus(selectedItem.categoryName, selectedItem.status)}
+            >
+              {selectedItem.status === 1 ? 'Deactivate' : 'Activate'}
             </button>
           </animated.div>
         </div>

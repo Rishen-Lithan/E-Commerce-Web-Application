@@ -66,10 +66,10 @@ header .sign-in-btn:hover {
 }
 
 .toast-container {
-  z-index: 10000; /* Ensure it's on top of all elements */
+  z-index: 10000; 
   position: fixed;
-  top: 20px; /* Adjust the top position */
-  right: 20px; /* Adjust the right position */
+  top: 20px; 
+  right: 20px;
   width: auto;
   max-width: 400px;
 }
