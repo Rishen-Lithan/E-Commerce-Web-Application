@@ -1,5 +1,4 @@
-"# Web Application
-This project is a comprehensive web application designed to handle user management, product creation, and order processing. The system is built with distinct roles for Administrators, Vendors, and Customer Service Representatives (CSR), each having access to unique features.
+"# This project is a comprehensive web application designed to handle user management, product creation, and order processing. The system is built with distinct roles for Administrators, Vendors, and Customer Service Representatives (CSR), each having access to unique features.
 
 ## Key Features:
 - **User Management:** Role-based access for Administrators, Vendors, and CSR.
