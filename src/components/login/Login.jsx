@@ -1,27 +1,76 @@
 import React, { useState } from 'react';
 import './LoginForm.css';
-import { useNavigate } from 'react-router-dom'; // Update import here
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { APP_URL } from '../../config/config';
 
 const LoginForm = () => {
+    // Admin - admin.test@example.com
+    // Vendor - vendor.test@gmail.com
+    // CSR - abc@gmail.com
+    // User - ab@gmail.com
+    // Vendor - vendorc@example.com - Password123!
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const navigate = useNavigate(); // Update usage here
+    const navigate = useNavigate();
 
     const handleLogin = (e) => {
         e.preventDefault();
 
-        setErrorMessage('');
-        console.log('Login successful:', { email, password });
+        const regex_email = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
-        toast.success('User Login Successful')
+        if (!email) {
+            toast.error('Please Enter the Email');
+            return;
+        } else if (!regex_email.test(email)) {
+            toast.error('Please Enter a Valid Email');
+            return;
+        } else if (!password) {
+            toast.error('Please Enter the Password');
+            return;
+        } else if (password.length < 8) {
+            toast.error('Password Should have at least 8 Characters');
+            return;
+        }
 
-        setTimeout(() => {
-            navigate('/home'); // Use navigate instead of history.push
-        }, 2000);
+        fetch(APP_URL + 'Auth/login', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then((responseJson) => {
+            console.log('User Login Response: ', responseJson);
+            setErrorMessage('');
+
+            localStorage.setItem('token', responseJson.token);
+            localStorage.setItem('role', responseJson.role);
+
+            toast.success('User Login Successful');
+
+            setTimeout(() => {
+                navigate('/home');
+            }, 1000);
+            
+        })
+        .catch((error) => {
+            console.log('User Login Failed: ', error);
+            toast.error('User Login Failed');
+        });
     };
 
     return (
@@ -59,7 +108,7 @@ const LoginForm = () => {
                     <p><a href="/forgot-password">Forgot your password?</a></p>
                 </div>
             </div>
-            <ToastContainer />
+            <ToastContainer className="toast-container" />
         </div>
     );
 };

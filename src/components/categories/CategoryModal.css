@@ -1,0 +1,80 @@
+.category-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+  
+.category-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.category-modal-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+  
+.category-modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+  
+.category-deactivate-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+  
+.category-deactivate-btn:hover {
+    background-color: #ff1a1a;
+}
+  
+.category-close-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+  
+.category-close-btn:hover {
+    background-color: #45a049;
+}
+  
+@media (max-width: 768px) {
+  .category-modal-content {
+      max-width: 90%;
+  }
+  
+  .category-modal-content h2 {
+      font-size: 20px;
+  }
+}
+  

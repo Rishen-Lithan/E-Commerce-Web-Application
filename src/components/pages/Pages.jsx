@@ -10,19 +10,34 @@ import Services from "../services/Services";
 import Contact from "../contact/Contact";
 import LoginForm from "../login/Login";
 import RegisterForm from "../register/Register";
+import AddProducts from "../products/AddProducts";
+import EditProducts from "../products/EditProduct";
+import OrdersPage from "../home/orders/OrdersPage";
+import Vendors from "../vendors/Vendors";
+import AddVendors from "../vendors/AddVendors";
+import Category from "../categories/Category";
+import Users from "../users/Users";
+import ListVendors from "../vendors/ListVendors";
+import VendorComments from "../vendors/VendorComments";
+import AllOrders from '../orders/OrdersPage';
+import CancelRequests from "../orders/CancelRequests";
+import VendorOrdersView from "../vendor-orders/VendorOrdersView";
 
 const Pages = () => {
   const location = useLocation(); 
 
   const isLoginPage = location.pathname === "/";
   const isRegisterPage = location.pathname === '/register';
+  const isAddProducts = location.pathname === '/add-Product';
+  const isEditProducts = location.pathname === '/edit-Product';
+  const isOrdersPage = location.pathname === '/orders';
+  const isAddVendorPage = location.pathname === '/add-Vendor';
 
   return (
     <>
-      {/* Render Header only if not on Login or Register page */}
-      {!isLoginPage && !isRegisterPage && <Header />}
+      {!isLoginPage && !isRegisterPage && !isAddProducts && !isEditProducts && !isAddVendorPage && <Header />}
       
-      {/* Use Routes instead of Switch */}
+      
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/home" element={<Home />} />
@@ -32,10 +47,21 @@ const Pages = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/vendors" element={<Vendors />} />
+        <Route path="/add-Product" element={<AddProducts />} />
+        <Route path="/edit-Product" element={<EditProducts />} />
+        <Route path="/add-Vendor" element={<AddVendors />} />
+        <Route path="/categories" element={<Category />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/all-Orders" element={<AllOrders />} />
+        <Route path="/list-Vendors" element={<ListVendors />} />
+        <Route path="/cancel-requests" element={<CancelRequests />} />
+        <Route path="/vendor-comments/:vendorId" element={<VendorComments />} />
+        <Route path="/vendor-orders" element={<VendorOrdersView />} />
       </Routes>
       
-      {/* Render Footer only if not on Login or Register page */}
-      {!isLoginPage && !isRegisterPage && <Footer />}
+      {!isLoginPage && !isRegisterPage && !isAddProducts && !isEditProducts && !isOrdersPage && !isAddVendorPage && <Footer />}
     </>
   );
 };

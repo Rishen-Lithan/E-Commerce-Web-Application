@@ -8,7 +8,7 @@ const Services = () => {
   return (
     <>
       <section className='services mb'>
-        <Back name='Services' title='Services -All Services' cover={img} />
+        <Back name='Categories' title='Categories -All Categories' cover={img} />
         <div className='featured container'>
           <FeaturedCard />
         </div>

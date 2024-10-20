@@ -19,3 +19,32 @@
   border-top: 1px solid #e4e8f3;
   padding: 10px 30px;
 }
+
+.p-image {
+  width: 100%;
+  height: 280px;
+  cursor: pointer;
+}
+
+.quantity-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.quantity-controls .count-btn {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.toast-container {
+  z-index: 9999;
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  margin-top: 20px;
+}

@@ -8,7 +8,7 @@ export const nav = [
     path: "/about",
   },
   {
-    text: "services",
+    text: "categories",
     path: "/services",
   },
   {
@@ -16,11 +16,38 @@ export const nav = [
     path: "/blog",
   },
   {
-    text: "pricing",
-    path: "/pricing",
+    text: "contact",
+    path: "/contact",
   },
   {
-    text: "contact",
+    text: "Orders",
+    path: "/vendor-orders"
+  }
+]
+
+export const customerNav = [
+  {
+    text: "home",
+    path: "/home",
+  },
+  {
+    text: "about",
+    path: "/about",
+  },
+  {
+    text: "Vendors",
+    path: "/vendors",
+  },
+  {
+    text: "Product",
+    path: "/blog",
+  },
+  {
+    text: "Orders",
+    path: "/orders",
+  },
+  {
+    text: "Notifications",
     path: "/contact",
   },
 ]
@@ -36,22 +63,40 @@ export const adminNav = [
   },
   {
     text: "Orders",
-    path: "/services",
+    path: "/all-Orders",
   },
   {
     text: "Product",
     path: "/blog",
   },
   {
-    text: "Categories",
-    path: "/pricing",
+    text: "Vendors",
+    path: "/vendors",
   },
   {
-    text: "contact",
-    path: "/contact",
+    text: "Category",
+    path: "/categories",
   },
 ]
 
+export const csrNav = [
+  {
+    text: "home",
+    path: "/home",
+  },
+  {
+    text: "about",
+    path: "/about",
+  },
+  {
+    text: "Orders",
+    path: "/all-Orders",
+  },
+  {
+    text: "Product",
+    path: "/blog",
+  },
+]
 
 export const featured = [
   {
@@ -79,6 +124,21 @@ export const featured = [
     name: "Villa & Condo",
     total: "80 Property",
   },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
+    total: "80 Property",
+  },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
+    total: "80 Property",
+  },
+  {
+    cover: "../images/hero/h6.png",
+    name: "Villa & Condo",
+    total: "80 Property",
+  },
 ]
 export const list = [
   {
@@ -86,54 +146,60 @@ export const list = [
     cover: "../images/list/p-1.png",
     name: "Red Carpet Real Estate",
     location: "210 Zirak Road, Canada",
-    category: "For Rent",
+    category: "In Stock",
     price: "$3,700",
     type: "Apartment",
+    qty : 1000
   },
   {
     id: 2,
     cover: "../images/list/p-2.png",
     name: "Fairmount Properties",
     location: "5698 Zirak Road, NewYork",
-    category: "For Sale",
+    category: "Out of Stock",
     price: "$9,750",
     type: "Condos",
+    qty : 1000
   },
   {
     id: 3,
     cover: "../images/list/p-7.png",
     name: "The Real Estate Corner",
     location: "5624 Mooker Market, USA",
-    category: "For Rent",
+    category: "Low Stock",
     price: "$5,860",
     type: "Offices",
+    qty : 1000
   },
   {
     id: 4,
     cover: "../images/list/p-4.png",
     name: "Herringbone Realty",
     location: "5621 Liverpool, London",
-    category: "For Sale",
+    category: "In Stock",
     price: "$7,540",
     type: "Homes & Villas",
+    qty : 1000
   },
   {
     id: 5,
     cover: "../images/list/p-5.png",
     name: "Brick Lane Realty",
     location: "210 Montreal Road, Canada",
-    category: "For Rent",
+    category: "In Stock",
     price: "$4,850",
     type: "Commercial",
+    qty : 1000
   },
   {
     id: 6,
     cover: "../images/list/p-6.png",
     name: "Banyon Tree Realty",
     location: "210 Zirak Road, Canada",
-    category: "For Sale",
+    category: "In Stock",
     price: "$2,742",
     type: "Apartment",
+    qty : 1000
   },
 ]
 export const awards = [
@@ -162,48 +228,48 @@ export const location = [
   {
     id: 1,
     name: "New Orleans, Louisiana",
-    Villas: "12 Villas",
-    Apartments: "10 Apartments",
+    Villas: "1 Head Office",
+    Apartments: "10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-1.png",
   },
   {
     id: 2,
     name: "Jerrsy, United State",
-    Villas: "12 Villas",
-    Apartments: "10 Apartments",
+    Villas: "12 Head Office",
+    Apartments: "10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-2.png",
   },
   {
     id: 3,
     name: "Liverpool, London",
-    Villas: "12 Villas",
-    Apartments: " 10 Apartments",
+    Villas: "12 Head Office",
+    Apartments: " 10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-3.png",
   },
   {
     id: 4,
     name: "NewYork, United States",
-    Villas: "12 Villas",
-    Apartments: " 10 Apartments",
+    Villas: "12 Head Office",
+    Apartments: " 10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-4.png",
   },
   {
     id: 5,
     name: "Montreal, Canada",
-    Villas: "12 Villas",
-    Apartments: " 10 Apartments",
+    Villas: "12 Head Office",
+    Apartments: " 10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-5.png",
   },
   {
     id: 6,
     name: "California, USA",
-    Villas: "12 Villas",
-    Apartments: " 10 Apartments",
+    Villas: "12 Head Office",
+    Apartments: " 10 Branches",
     Offices: "07 Offices",
     cover: "./images/location/city-6.png",
   },

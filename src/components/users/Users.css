@@ -1,0 +1,52 @@
+/* Users.css */
+.users-container {
+    padding: 20px;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .responsive-table th, .responsive-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .responsive-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .update-btn, .edit-btn {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .update-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .edit-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .responsive-table th, .responsive-table td {
+      font-size: 14px;
+    }
+  
+    .update-btn, .edit-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+  }
+  
