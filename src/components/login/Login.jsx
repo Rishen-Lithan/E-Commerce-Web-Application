@@ -11,8 +11,8 @@ const LoginForm = () => {
     // CSR - abc@gmail.com
     // User - ab@gmail.com
     // Vendor - vendorc@example.com - Password123!
-    const [email, setEmail] = useState('vendorc@example.com');
-    const [password, setPassword] = useState('Password123!');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();

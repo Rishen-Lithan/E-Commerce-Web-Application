@@ -13,8 +13,12 @@ const About = () => {
           <div className='left row'>
             <Heading title='Our Agency Story' subtitle='Check out our company story and work process' />
 
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</p>
+            <p>
+              At Trend Mark, we are committed to delivering quality products that enhance your lifestyle. With a passion for excellence and a dedication to customer satisfaction, we bring you a diverse range of offerings tailored to meet your needs. Join us on a journey of discovery and innovation.
+            </p>
+            <p>
+              Founded with the belief that shopping should be simple, enjoyable, and personalized, [Your Company Name] strives to create an exceptional e-commerce experience. Our team works tirelessly to source the best products and ensure you receive the best service. We are here to make every purchase a delight.
+            </p>
             <button className='btn2'>More About Us</button>
           </div>
           <div className='right row'>
